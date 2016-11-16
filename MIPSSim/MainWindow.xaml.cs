@@ -129,22 +129,22 @@ namespace MIPSSim
 					}
 					break;
 				case 0x08:  // Addi
-					inst = "Addi " + RegName[t] + ", " + RegName[s] + ", " + ((Int16)imm).ToString();
+					inst = "Addi " + RegName[t] + ", " + RegName[s] + ", " + ((Int16)imm).ToString("X4");
 					break;
 				case 0x05:  // Bne
-					inst = "Bne " + RegName[s] + ", " + RegName[t] + ", " + ((Int16)imm).ToString();
+					inst = "Bne " + RegName[s] + ", " + RegName[t] + ", " + ((Int16)imm).ToString("X4");
 					break;
 				case 0x07:  // Bgtz
-					inst = "Bgtz " + RegName[s] + ", " + ((Int16)imm).ToString();
+					inst = "Bgtz " + RegName[s] + ", " + ((Int16)imm).ToString("X4");
 					break;
 				case 0x04:  // Beq
-					inst = "Beq " + RegName[s] + ", " + RegName[t] + ", " + ((Int16)imm).ToString();
+					inst = "Beq " + RegName[s] + ", " + RegName[t] + ", " + ((Int16)imm).ToString("X4");
 					break;
 				case 0x2b:  // Sw
-					inst = "Sw " + RegName[t] + ", " + ((Int16)imm).ToString() + "(" + RegName[s] + ")";
+					inst = "Sw " + RegName[t] + ", " + ((Int16)imm).ToString("X4") + "(" + RegName[s] + ")";
 					break;
 				case 0x23:  // Lw
-					inst = "Lw " + RegName[t] + ", " + ((Int16)imm).ToString() + "(" + RegName[s] + ")";
+					inst = "Lw " + RegName[t] + ", " + ((Int16)imm).ToString("X4") + "(" + RegName[s] + ")";
 					break;
 				default:
 					inst = "Err";
@@ -226,19 +226,19 @@ namespace MIPSSim
 				case 0x05:  // Bne
 					if (Reg[s] != Reg[t])
 					{
-						PC = (UInt32)((UInt32)PC + (Int16)imm * 4);
+						PC = (UInt32)((UInt32)PC + (Int16)imm * 4) - 4;
 					}
 					break;
 				case 0x07:  // Bgtz
 					if ((Int32)Reg[s] > 0)
 					{
-						PC = (UInt32)((UInt32)PC + (Int16)imm * 4);
+						PC = (UInt32)((UInt32)PC + (Int16)imm * 4) - 4;
 					}
 					break;
 				case 0x04:  // Beq
 					if (Reg[s] == Reg[t])
 					{
-						PC = (UInt32)((UInt32)PC + (Int16)imm * 4);
+						PC = (UInt32)((UInt32)PC + (Int16)imm * 4) - 4;
 					}
 					break;
 				case 0x2b:  // Sw

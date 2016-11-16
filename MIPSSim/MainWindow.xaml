@@ -21,9 +21,9 @@
 							<ColumnDefinition Width="*"/>
 							<ColumnDefinition Width="*"/>
 						</Grid.ColumnDefinitions>
-						<TextBlock Grid.Column="0" Text="{Binding Id}" Margin="5"/>
-						<TextBlock Grid.Column="1" Text="{Binding Name}" Margin="5"/>
-						<TextBlock Grid.Column="2" Text="{Binding Val}" Margin="5"/>
+						<TextBlock Grid.Column="0" Text="{Binding Id}" FontSize="24"/>
+						<TextBlock Grid.Column="1" Text="{Binding Name}" FontSize="24"/>
+						<TextBlock Grid.Column="2" Text="{Binding Val}" FontSize="24"/>
 					</Grid>
 				</DataTemplate>
 			</ListBox.ItemTemplate>
