@@ -112,10 +112,10 @@ namespace MIPSSim
 							inst = "Subu " + RegName[d] + ", " + RegName[s] + ", " + RegName[t];
 							break;
 						case 0x00:  // Sll
-							inst = "Sll " + RegName[d] + ", " + RegName[s] + ", " + RegName[t];
+							inst = "Sll " + RegName[d] + ", " + RegName[s] + ", " + h.ToString("X");
 							break;
 						case 0x02:  // Srl
-							inst = "Srl " + RegName[d] + ", " + RegName[s] + ", " + RegName[t];
+							inst = "Srl " + RegName[d] + ", " + RegName[s] + ", " + h.ToString("X");
 							break;
 						case 0x2a:  // Slt
 							inst = "Slt " + RegName[d] + ", " + RegName[s] + ", " + RegName[t];
@@ -226,19 +226,19 @@ namespace MIPSSim
 				case 0x05:  // Bne
 					if (Reg[s] != Reg[t])
 					{
-						PC = (UInt32)((UInt32)PC + (Int16)imm * 4) - 4;
+						PC = (UInt32)((UInt32)PC + (Int16)imm * 4);
 					}
 					break;
 				case 0x07:  // Bgtz
 					if ((Int32)Reg[s] > 0)
 					{
-						PC = (UInt32)((UInt32)PC + (Int16)imm * 4) - 4;
+						PC = (UInt32)((UInt32)PC + (Int16)imm * 4);
 					}
 					break;
 				case 0x04:  // Beq
 					if (Reg[s] == Reg[t])
 					{
-						PC = (UInt32)((UInt32)PC + (Int16)imm * 4) - 4;
+						PC = (UInt32)((UInt32)PC + (Int16)imm * 4);
 					}
 					break;
 				case 0x2b:  // Sw
