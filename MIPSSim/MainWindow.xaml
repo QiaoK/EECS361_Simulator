@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MIPSSim"
         mc:Ignorable="d"
-        Title="MIPS SIM" Height="350" Width="525">
+        Title="MIPS SIM" Height="350" Width="525" WindowStartupLocation="CenterScreen" WindowState="Maximized">
     <Grid>
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition Width="*"/>
@@ -85,21 +85,21 @@
 				</Grid.RowDefinitions>
 				<Grid.ColumnDefinitions>
 					<ColumnDefinition Width="auto"/>
-					<ColumnDefinition Width="*"/>
-					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="auto"/>
+					<ColumnDefinition Width="auto"/>
 				</Grid.ColumnDefinitions>
 
 				<TextBlock Grid.Row="1" Margin="5" Text="IF" FontSize="24"/>
 				<TextBlock Grid.Row="2" Margin="5" Text="ID" FontSize="24"/>
 				<TextBlock Grid.Row="3" Margin="5" Text="EX" FontSize="24"/>
-				<TextBlock Grid.Row="4" Margin="5" Text="MEM            " FontSize="24"/>
+				<TextBlock Grid.Row="4" Margin="5" Text="MEM" FontSize="24"/>
 				<TextBlock Grid.Row="5" Margin="5" Text="WB" FontSize="24"/>
 
-				<TextBlock Grid.Row="1" Grid.Column="1" Margin="5" Name="TxtIFI" FontSize="24"/>
-				<TextBlock Grid.Row="2" Grid.Column="1" Margin="5" Name="TxtIDI" FontSize="24"/>
-				<TextBlock Grid.Row="3" Grid.Column="1" Margin="5" Name="TxtEXI" FontSize="24"/>
-				<TextBlock Grid.Row="4" Grid.Column="1" Margin="5" Name="TxtMEMI" FontSize="24"/>
-				<TextBlock Grid.Row="5" Grid.Column="1" Margin="5" Name="TxtWBI" FontSize="24"/>
+				<TextBlock Grid.Row="1" Grid.Column="1" Margin="25,5" Name="TxtIFI" FontSize="24"/>
+				<TextBlock Grid.Row="2" Grid.Column="1" Margin="25,5" Name="TxtIDI" FontSize="24"/>
+				<TextBlock Grid.Row="3" Grid.Column="1" Margin="25,5" Name="TxtEXI" FontSize="24"/>
+				<TextBlock Grid.Row="4" Grid.Column="1" Margin="25,5" Name="TxtMEMI" FontSize="24"/>
+				<TextBlock Grid.Row="5" Grid.Column="1" Margin="25,5" Name="TxtWBI" FontSize="24"/>
 
 				<TextBlock Grid.Row="1" Grid.Column="2" Margin="5" Name="TxtIF" FontSize="24"/>
 				<TextBlock Grid.Row="2" Grid.Column="2" Margin="5" Name="TxtID" FontSize="24"/>

@@ -33,7 +33,8 @@ namespace MIPSSim
 		UInt32[] Pipe = new UInt32[5];
 		UInt32 PC;
 		Dictionary<UInt32, UInt32> Mem = new Dictionary<uint, uint>();
-		
+		Dictionary<UInt32, UInt32> TMem;
+
 		public MainWindow()
 		{
 			int i;
@@ -177,11 +178,11 @@ namespace MIPSSim
 			
 			if (Branch()){
 				Run(Pipe[4]);
-				for (i = 3; i > 2; i--)
+				for (i = 3; i > 1; i--)
 				{
 					Pipe[i + 1] = Pipe[i];
 				}
-				for (i = 1; i < 4; i++)
+				for (i = 1; i < 3; i++)
 				{
 					Pipe[i] = 0x00000000;
 				}
@@ -236,52 +237,61 @@ namespace MIPSSim
 			bool b = false;
 			int i;
 
-			for(i = 0; i < 32; i++)
-			{
-				TReg[i] = Reg[i];
-			}
-
-			Run(Pipe[4]);
-			
-			inst = Pipe[3];
+			inst = Pipe[2];
 			op = inst >> 26;
-			s = inst >> 21 & 0x1f;
-			t = inst >> 16 & 0x1f;
-			d = inst >> 11 & 0x1f;
-			h = inst >> 6 & 0x1f;
-			imm = inst & 0xffff;
-			func = inst & 0x3f;
 
-			switch (op)
+			if (op == 0x05 || op == 0x07 || op == 0x04)
 			{
-				case 0x05:  // Bne
-					if (Reg[s] != Reg[t])
-					{
-						PC = (UInt32)((UInt32)PC + (Int16)imm * 4) - 12;
-						b = true;
-					}
-					break;
-				case 0x07:  // Bgtz
-					if ((Int32)Reg[s] > 0)
-					{
-						PC = (UInt32)((UInt32)PC + (Int16)imm * 4) - 12;
-						b = true;
-					}
-					break;
-				case 0x04:  // Beq
-					if (Reg[s] == Reg[t])
-					{
-						PC = (UInt32)((UInt32)PC + (Int16)imm * 4) - 12;
-						b = true;
-					}
-					break;
-				default:
-					break;
-			}
 
-			for (i = 0; i < 32; i++)
-			{
-				Reg[i] = TReg[i];
+				for (i = 0; i < 32; i++)
+				{
+					TReg[i] = Reg[i];
+				}
+				TMem = new Dictionary<uint, uint>(Mem);
+
+				Run(Pipe[4]);
+				Run(Pipe[3]);
+
+				op = inst >> 26;
+				s = inst >> 21 & 0x1f;
+				t = inst >> 16 & 0x1f;
+				d = inst >> 11 & 0x1f;
+				h = inst >> 6 & 0x1f;
+				imm = inst & 0xffff;
+				func = inst & 0x3f;
+
+				switch (op)
+				{
+					case 0x05:  // Bne
+						if (Reg[s] != Reg[t])
+						{
+							PC = (UInt32)((UInt32)PC + (Int16)imm * 4) - 12;
+							b = true;
+						}
+						break;
+					case 0x07:  // Bgtz
+						if ((Int32)Reg[s] > 0)
+						{
+							PC = (UInt32)((UInt32)PC + (Int16)imm * 4) - 12;
+							b = true;
+						}
+						break;
+					case 0x04:  // Beq
+						if (Reg[s] == Reg[t])
+						{
+							PC = (UInt32)((UInt32)PC + (Int16)imm * 4) - 12;
+							b = true;
+						}
+						break;
+					default:
+						break;
+				}
+
+				for (i = 0; i < 32; i++)
+				{
+					Reg[i] = TReg[i];
+				}
+				Mem = new Dictionary<uint, uint>(TMem);
 			}
 
 			return b;
