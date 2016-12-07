@@ -29,6 +29,8 @@ namespace MIPSSim
 							, "$s0", "$s1", "$s2", "$s3", "$s4", "$s5", "$s6", "$s7", "$t8", "$t9", "$k0", "$k1", "$gp", "$sp", "$fp", "$ra"};
 
 		UInt32[] Reg = new UInt32[32];
+		UInt32[] TReg = new UInt32[32];
+		UInt32[] Pipe = new UInt32[5];
 		UInt32 PC;
 		Dictionary<UInt32, UInt32> Mem = new Dictionary<uint, uint>();
 		
@@ -72,14 +74,19 @@ namespace MIPSSim
 
 			TxtPc.Text = PC.ToString("X8");
 
-			TxtInst.Text = IDecode();
+			TxtInst.Text = IDecode(Pipe[0]);
+
+			TxtIF.Text = IDecode(Pipe[0]);
+			TxtID.Text = IDecode(Pipe[1]);
+			TxtEX.Text = IDecode(Pipe[2]);
+			TxtMEM.Text = IDecode(Pipe[3]);
+			TxtWB.Text = IDecode(Pipe[4]);
 		}
 
-		string IDecode()
+		string IDecode(UInt32 i)
 		{
-			UInt32 i, op, s, t, d, h, imm, func;
+			UInt32 op, s, t, d, h, imm, func;
 			string inst;
-			i = MemRead(PC);
 			op = i >> 26;
 			s = i >> 21 & 0x1f;
 			t = i >> 16 & 0x1f;
@@ -113,6 +120,10 @@ namespace MIPSSim
 							break;
 						case 0x00:  // Sll
 							inst = "Sll " + RegName[d] + ", " + RegName[s] + ", " + h.ToString("X");
+							if (d == 0)
+							{
+								inst = "Nop";
+							}
 							break;
 						case 0x02:  // Srl
 							inst = "Srl " + RegName[d] + ", " + RegName[s] + ", " + h.ToString("X");
@@ -156,9 +167,123 @@ namespace MIPSSim
 
 		bool Clk()
 		{
-			UInt32 inst;
+			int i;
+			
+			if (Branch()){
+				Run(Pipe[4]);
+				for (i = 3; i > 2; i--)
+				{
+					Pipe[i + 1] = Pipe[i];
+				}
+				for (i = 1; i < 4; i++)
+				{
+					Pipe[i] = 0x00000000;
+				}
+				PC += 4;
+				Pipe[0] = MemRead(PC);
+			}
+			else if (Stall()){
+				Run(Pipe[4]);
+				for (i = 3; i > 1; i--)
+				{
+					Pipe[i + 1] = Pipe[i];
+				}
+				Pipe[2] = 0x00000000;
+			}
+			else
+			{
+				Run(Pipe[4]);
+				for (i = 3; i > -1; i--)
+				{
+					Pipe[i + 1] = Pipe[i];
+				}
+				PC += 4;
+				Pipe[0] = MemRead(PC);
+			}
+
+			UpdateScreen();
+
+			return true;
+		}
+
+		bool Stall()
+		{
+			UInt32 inst, inst2, op, s, t, t2;
+
+			inst = Pipe[1];
+			inst2 = Pipe[2];
+			op = inst2 >> 26;
+			s = inst >> 21 & 0x1f;
+			t = inst >> 16 & 0x1f;
+			t2 = inst2 >> 16 & 0x1f;
+			if (op == 0x23 && (t2 == t || t2 == s))
+			{
+				return true;
+			}
+
+			return false;
+		}
+
+		bool Branch()
+		{
+			UInt32 inst, op, s, t, d, h, imm, func;
+			bool b = false;
+			int i;
+
+			for(i = 0; i < 32; i++)
+			{
+				TReg[i] = Reg[i];
+			}
+
+			Run(Pipe[4]);
+			
+			inst = Pipe[3];
+			op = inst >> 26;
+			s = inst >> 21 & 0x1f;
+			t = inst >> 16 & 0x1f;
+			d = inst >> 11 & 0x1f;
+			h = inst >> 6 & 0x1f;
+			imm = inst & 0xffff;
+			func = inst & 0x3f;
+
+			switch (op)
+			{
+				case 0x05:  // Bne
+					if (Reg[s] != Reg[t])
+					{
+						PC = (UInt32)((UInt32)PC + (Int16)imm * 4) - 12;
+						b = true;
+					}
+					break;
+				case 0x07:  // Bgtz
+					if ((Int32)Reg[s] > 0)
+					{
+						PC = (UInt32)((UInt32)PC + (Int16)imm * 4) - 12;
+						b = true;
+					}
+					break;
+				case 0x04:  // Beq
+					if (Reg[s] == Reg[t])
+					{
+						PC = (UInt32)((UInt32)PC + (Int16)imm * 4) - 12;
+						b = true;
+					}
+					break;
+				default:
+					break;
+			}
+
+			for (i = 0; i < 32; i++)
+			{
+				Reg[i] = TReg[i];
+			}
+
+			return b;
+		}
+
+		bool Run(UInt32 inst)
+		{
 			UInt32 op, s, t, d, h, imm, func;
-			inst = MemRead(PC);
 			op = inst >> 26;
 			s = inst >> 21 & 0x1f;
 			t = inst >> 16 & 0x1f;
@@ -223,24 +348,6 @@ namespace MIPSSim
 				case 0x08:  // Addi
 					Reg[t] = (UInt32)((Int32)Reg[s] + (Int16)imm);
 					break;
-				case 0x05:  // Bne
-					if (Reg[s] != Reg[t])
-					{
-						PC = (UInt32)((UInt32)PC + (Int16)imm * 4);
-					}
-					break;
-				case 0x07:  // Bgtz
-					if ((Int32)Reg[s] > 0)
-					{
-						PC = (UInt32)((UInt32)PC + (Int16)imm * 4);
-					}
-					break;
-				case 0x04:  // Beq
-					if (Reg[s] == Reg[t])
-					{
-						PC = (UInt32)((UInt32)PC + (Int16)imm * 4);
-					}
-					break;
 				case 0x2b:  // Sw
 					MemWrite((UInt32)((UInt32)Reg[s] + (Int16)imm), Reg[t]);
 					break;
@@ -251,10 +358,7 @@ namespace MIPSSim
 					return false;
 			}
 
-			PC += 4;
 			Reg[0] = 0;
-
-			UpdateScreen();
 
 			return true;
 		}
@@ -310,13 +414,18 @@ namespace MIPSSim
 
 		void Reset()
 		{
-			PC = 0x00400020;
+			PC = 0x0040001C;
 			int i;
 			for (i = 0; i < 32; i++)
 			{
 				Reg[i] = 0;
 			}
 			Reg[29] = 0x7fffffff;
+			for (i = 0; i < 5; i++)
+			{
+				Pipe[i] = 0;
+			}
+			Clk();
 			UpdateScreen();
 		}
 
