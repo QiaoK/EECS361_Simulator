@@ -81,6 +81,12 @@ namespace MIPSSim
 			TxtEX.Text = IDecode(Pipe[2]);
 			TxtMEM.Text = IDecode(Pipe[3]);
 			TxtWB.Text = IDecode(Pipe[4]);
+
+			TxtIFI.Text = Pipe[0].ToString("X8");
+			TxtIDI.Text = Pipe[1].ToString("X8");
+			TxtEXI.Text = Pipe[2].ToString("X8");
+			TxtMEMI.Text = Pipe[3].ToString("X8");
+			TxtWBI.Text = Pipe[4].ToString("X8");
 		}
 
 		string IDecode(UInt32 i)
